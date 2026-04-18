@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { User, signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db, handleFirestoreError, OperationType } from '../../lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, getDocFromServer } from 'firebase/firestore';
 
@@ -75,10 +75,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in", error);
+      
+      // If the popup is blocked by the browser, or flashes and closes automatically
+      // due to strict security settings (like Brave, Safari, or mobile browsers),
+      // we gracefully fall back to a full-page redirect.
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        console.log("Popup closed or blocked. Falling back to redirect...");
+        // Add a tiny delay so the user understands what is happening if they clicked it
+        setTimeout(() => {
+          signInWithRedirect(auth, provider).catch(err => {
+            console.error("Redirect sign-in failed", err);
+          });
+        }, 500);
+      } else {
+        alert("Sign in issue: " + error.message);
+      }
     }
   };
 
