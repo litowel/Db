@@ -119,6 +119,7 @@ export default function Home() {
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-6 border border-blue-100">
                 <Zap className="w-4 h-4" /> Powered by Upfrica.africa
               </span>
+              <img src="/logo.png" alt="DealBridge AI Logo" className="h-16 md:h-20 w-auto mb-6 mx-auto object-contain" />
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-6">
                 Unlock Funding for Your Business with AI
               </h1>

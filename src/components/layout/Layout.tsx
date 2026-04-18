@@ -19,7 +19,7 @@ export default function Layout() {
       <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 max-w-[200px] md:max-w-[250px]">
-            <img src="/nlogo.png" alt="DealBridge AI powered by Upfrica.africa" className="h-8 md:h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="DealBridge AI Logo" className="h-10 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
@@ -148,7 +148,7 @@ export default function Layout() {
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4 max-w-[200px] md:max-w-[250px]">
-              <img src="/nlogo.png" alt="DealBridge AI powered by Upfrica.africa" className="h-8 md:h-10 w-auto object-contain brightness-0 invert" />
+              <img src="/logo.png" alt="DealBridge AI Logo" className="h-10 w-auto object-contain brightness-0 invert" />
             </Link>
             <p className="text-sm text-gray-400 max-w-sm mb-4">
               Powered by Upfrica.africa. {t('footer.description')}
