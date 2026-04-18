@@ -1,0 +1,162 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+       return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+       return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+
+    function isDocUserId() {
+       return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+    
+    function uidUnchanged() {
+       return !('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid;
+    }
+    
+    function uidNotModified() {
+       return !('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid;
+    }
+
+    function userIdUnchanged() {
+       return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+
+    function userIdNotModified() {
+       return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+    
+    function hasRequiredFields(fields) {
+       return request.resource.data.keys().hasAll(fields);
+    }
+    
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+       return request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidEmail(email) {
+       return email is string &&
+         email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "qdpglobal2013@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['uid', 'email', 'companyName', 'membershipTier', 'membershipStatus', 'role', 'createdAt']) &&
+             data.uid is string &&
+             data.email is string && isValidEmail(data.email) &&
+             isValidOptionalString('companyName', 0, 100) &&
+             data.membershipTier in ['NONE', 'GROWTH', 'FUNDING_ACCESS'] &&
+             data.role in ['admin', 'client'] &&
+             (!( 'membershipStatus' in data ) || data.membershipStatus in ['ACTIVE', 'PAST_DUE', 'CANCELED']) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidBusinessProfile(data) {
+      return hasOnlyAllowedFields(['userId', 'revenue', 'industry', 'country', 'socialUrl', 'riskScore', 'isQualified', 'aiInsights', 'lastAnalyzedAt']) &&
+             data.userId is string &&
+             data.revenue is number && data.revenue >= 0 &&
+             validStringLength('industry', 1, 100) &&
+             validStringLength('country', 1, 100) &&
+             isValidOptionalString('socialUrl', 0, 500) &&
+             data.riskScore is number && data.riskScore >= 0 && data.riskScore <= 100 &&
+             data.isQualified is bool &&
+             isValidOptionalString('aiInsights', 0, 5000) &&
+             data.lastAnalyzedAt is timestamp;
+    }
+    
+    function isValidApplication(data) {
+      return hasOnlyAllowedFields(['userId', 'amountRequested', 'purpose', 'aiSummary', 'status', 'createdAt']) &&
+             data.userId is string &&
+             data.amountRequested is number && data.amountRequested >= 0 &&
+             validStringLength('purpose', 1, 200) &&
+             isValidOptionalString('aiSummary', 0, 5000) &&
+             data.status in ['DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'OFFER_RECEIVED', 'REJECTED'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidLenderMatch(data) {
+      return hasOnlyAllowedFields(['applicationId', 'userId', 'lenderName', 'fundingType', 'matchScore', 'status']) &&
+             data.applicationId is string &&
+             data.userId is string &&
+             validStringLength('lenderName', 1, 200) &&
+             isValidOptionalString('fundingType', 0, 100) &&
+             (!( 'matchScore' in data ) || (data.matchScore is number && data.matchScore >= 0 && data.matchScore <= 100)) &&
+             data.status in ['PENDING', 'ACCEPTED', 'DECLINED'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    uidUnchanged() && request.auth.uid == userId &&
+                    ((request.resource.data.role == 'client' && request.resource.data.membershipTier == 'NONE') || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    uidNotModified() && 
+                    // users cannot update their own role or membership tier to arbitrary values
+                    ((isOwner(userId) && request.resource.data.role == resource.data.role && request.resource.data.membershipTier == resource.data.membershipTier) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /businessProfiles/{profileId} {
+      allow read: if isDocUserId() || isAdmin();
+      allow create: if isAuthenticated() && isValidBusinessProfile(request.resource.data) && 
+                    userIdUnchanged();
+      allow update: if isAuthenticated() && isValidBusinessProfile(request.resource.data) && 
+                    userIdNotModified() && (isDocUserId() || isAdmin());
+      allow delete: if isDocUserId() || isAdmin();
+    }
+
+    match /applications/{applicationId} {
+      allow read: if isDocUserId() || isAdmin();
+      allow create: if isAuthenticated() && isValidApplication(request.resource.data) && 
+                    userIdUnchanged();
+      allow update: if isAuthenticated() && isValidApplication(request.resource.data) && 
+                    userIdNotModified() && (isDocUserId() || isAdmin());
+      allow delete: if isAdmin(); // only admins can delete applications
+    }
+    
+    match /lenderMatches/{matchId} {
+      allow read: if isDocUserId() || isAdmin();
+      allow create: if isAdmin(); // Only admins/backend can create matches
+      allow update: if isAuthenticated() && isValidLenderMatch(request.resource.data) && 
+                    userIdNotModified() && 
+                    (isAdmin() || (isDocUserId() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))); // User can only change status (Accept/Decline)
+      allow delete: if isAdmin();
+    }
+  }
+}

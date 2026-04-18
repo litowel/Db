@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the platform",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "companyName": { "type": "string" },
+        "membershipTier": { "type": "string", "enum": ["NONE", "GROWTH", "FUNDING_ACCESS"] },
+        "membershipStatus": { "type": "string", "enum": ["ACTIVE", "PAST_DUE", "CANCELED"] },
+        "role": { "type": "string", "enum": ["admin", "client"] },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["uid", "email", "membershipTier", "role", "createdAt"]
+    },
+    "BusinessProfile": {
+      "title": "BusinessProfile",
+      "description": "Eligibility profile for a business",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "revenue": { "type": "number" },
+        "industry": { "type": "string" },
+        "country": { "type": "string" },
+        "socialUrl": { "type": "string" },
+        "riskScore": { "type": "number" },
+        "isQualified": { "type": "boolean" },
+        "aiInsights": { "type": "string" },
+        "lastAnalyzedAt": { "type": "timestamp" }
+      },
+      "required": ["userId", "revenue", "industry", "country", "riskScore", "isQualified", "lastAnalyzedAt"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "User application for funding",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amountRequested": { "type": "number" },
+        "purpose": { "type": "string" },
+        "aiSummary": { "type": "string" },
+        "status": { "type": "string", "enum": ["DRAFT", "SUBMITTED", "UNDER_REVIEW", "OFFER_RECEIVED", "REJECTED"] },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["userId", "amountRequested", "purpose", "status", "createdAt"]
+    },
+    "LenderMatch": {
+      "title": "LenderMatch",
+      "description": "A lender matched to an application",
+      "type": "object",
+      "properties": {
+        "applicationId": { "type": "string" },
+        "userId": { "type": "string" },
+        "lenderName": { "type": "string" },
+        "fundingType": { "type": "string" },
+        "matchScore": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "ACCEPTED", "DECLINED"] }
+      },
+      "required": ["applicationId", "userId", "lenderName", "status"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profiles"
+    },
+    "businessProfiles/{profileId}": {
+      "schema": { "$ref": "BusinessProfile" },
+      "description": "Business eligibility profiles linked to users"
+    },
+    "applications/{applicationId}": {
+      "schema": { "$ref": "Application" },
+      "description": "Funding applications"
+    },
+    "lenderMatches/{matchId}": {
+      "schema": { "$ref": "LenderMatch" },
+      "description": "Lenders matched to an application"
+    }
+  }
+}
