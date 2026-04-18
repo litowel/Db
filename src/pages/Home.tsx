@@ -7,31 +7,31 @@ import Autoplay from "embla-carousel-autoplay";
 import { useCallback } from "react";
 
 const slidesData = [
-  { img: "growth", title: "Scale Your Business", desc: "Gain access to capital that fuels your expansion and growth." },
-  { img: "industry", title: "All Industries", desc: "From tech to retail, we match you with lenders who understand your sector." },
-  { img: "startup", title: "Any Company Size", desc: "Whether you're a startup or an enterprise, find right-sized funding." },
-  { img: "finance", title: "Flexible Amounts", desc: "Secure anywhere from $10k to $10M+ depending on your business needs." },
-  { img: "project", title: "Project Financing", desc: "Fund large-scale infrastructure or long-term industrial projects." },
-  { img: "merger", title: "Mergers & Acquisitions", desc: "Capital to acquire competitors or merge for strategic market dominance." },
-  { img: "real-estate", title: "Property Purchase", desc: "Commercial real estate loans to buy your own office or warehouse." },
-  { img: "tractor", title: "Equipment Financing", desc: "Upgrade machinery, vehicles, and tech without massive upfront costs." },
-  { img: "cash", title: "Working Capital", desc: "Cover daily operations, payroll, and unexpected expenses smoothly." },
-  { img: "tech", title: "Tech Startups", desc: "Specialized venture debt and revenue-based financing for SaaS." },
-  { img: "clinic", title: "Healthcare & Clinics", desc: "Expand medical practices and purchase advanced medical equipment." },
-  { img: "construction", title: "Construction", desc: "Bridge loans and project finance to keep building without delays." },
-  { img: "farm", title: "Agriculture", desc: "Seasonal funding for seeds, machinery, and agricultural expansion." },
-  { img: "ecommerce", title: "Retail & E-commerce", desc: "Inventory financing specifically designed for fast-moving consumer goods." },
-  { img: "factory", title: "Manufacturing", desc: "Supply chain financing to meet massive production orders." },
-  { img: "speed", title: "Fast Application", desc: "A streamlined digital process that saves you weeks of paperwork." },
-  { img: "free", title: "No Upfront Fees", desc: "Apply and get matched without paying hidden application charges." },
-  { img: "handshake", title: "High Approval Rates", desc: "Our AI pre-qualification means you only apply where you fit." },
-  { img: "globe", title: "Global Expansion", desc: "Funding to take your local business to the international market." },
-  { img: "store", title: "Franchise Financing", desc: "Capital to open your next franchise location quickly." },
-  { img: "debt", title: "Debt Consolidation", desc: "Refinance expensive short-term loans into manageable monthly payments." },
-  { img: "truck", title: "Fleet Financing", desc: "Expand your logistics capability with specialized vehicle loans." },
-  { img: "cargo", title: "Import/Export", desc: "Trade finance solutions to keep international goods moving." },
-  { img: "invoice", title: "Invoice Factoring", desc: "Unlock tied-up cash instantly instead of waiting 90 days." },
-  { img: "success", title: "Join Thousands", desc: "Be part of the growing network of businesses funded through our platform." }
+  { img: "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80&w=600", title: "Scale Your Business", desc: "Gain access to capital that fuels your expansion and growth." },
+  { img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=600", title: "All Industries", desc: "From tech to retail, we match you with lenders who understand your sector." },
+  { img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600", title: "Any Company Size", desc: "Whether you're a startup or an enterprise, find right-sized funding." },
+  { img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600", title: "Flexible Amounts", desc: "Secure anywhere from $10k to $10M+ depending on your business needs." },
+  { img: "https://images.unsplash.com/photo-1541888086925-0c1bb6789c09?auto=format&fit=crop&q=80&w=600", title: "Project Financing", desc: "Fund large-scale infrastructure or long-term industrial projects." },
+  { img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=600", title: "Mergers & Acquisitions", desc: "Capital to acquire competitors or merge for strategic market dominance." },
+  { img: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600", title: "Property Purchase", desc: "Commercial real estate loans to buy your own office or warehouse." },
+  { img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600", title: "Equipment Financing", desc: "Upgrade machinery, vehicles, and tech without massive upfront costs." },
+  { img: "https://images.unsplash.com/photo-1580519542036-ed47f3ae3ca8?auto=format&fit=crop&q=80&w=600", title: "Working Capital", desc: "Cover daily operations, payroll, and unexpected expenses smoothly." },
+  { img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600", title: "Tech Startups", desc: "Specialized venture debt and revenue-based financing for SaaS." },
+  { img: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=600", title: "Healthcare & Clinics", desc: "Expand medical practices and purchase advanced medical equipment." },
+  { img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=600", title: "Construction", desc: "Bridge loans and project finance to keep building without delays." },
+  { img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&q=80&w=600", title: "Agriculture", desc: "Seasonal funding for seeds, machinery, and agricultural expansion." },
+  { img: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=600", title: "Retail & E-commerce", desc: "Inventory financing specifically designed for fast-moving consumer goods." },
+  { img: "https://images.unsplash.com/photo-1565514020179-026b92b84bb6?auto=format&fit=crop&q=80&w=600", title: "Manufacturing", desc: "Supply chain financing to meet massive production orders." },
+  { img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600", title: "Fast Application", desc: "A streamlined digital process that saves you weeks of paperwork." },
+  { img: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=600", title: "No Upfront Fees", desc: "Apply and get matched without paying hidden application charges." },
+  { img: "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=600", title: "High Approval Rates", desc: "Our AI pre-qualification means you only apply where you fit." },
+  { img: "https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?auto=format&fit=crop&q=80&w=600", title: "Global Expansion", desc: "Funding to take your local business to the international market." },
+  { img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=600", title: "Franchise Financing", desc: "Capital to open your next franchise location quickly." },
+  { img: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&q=80&w=600", title: "Debt Consolidation", desc: "Refinance expensive short-term loans into manageable monthly payments." },
+  { img: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=600", title: "Fleet Financing", desc: "Expand your logistics capability with specialized vehicle loans." },
+  { img: "https://images.unsplash.com/photo-1494412519320-ce68defdf29e?auto=format&fit=crop&q=80&w=600", title: "Import/Export", desc: "Trade finance solutions to keep international goods moving." },
+  { img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=600", title: "Invoice Factoring", desc: "Unlock tied-up cash instantly instead of waiting 90 days." },
+  { img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=600", title: "Join Thousands", desc: "Be part of the growing network of businesses funded through our platform." }
 ];
 
 function ShowcaseCarousel() {
@@ -73,7 +73,7 @@ function ShowcaseCarousel() {
                 <div className="h-48 overflow-hidden relative">
                   <div className="absolute inset-0 bg-blue-900/20 group-hover:bg-transparent transition-colors z-10"></div>
                   <img 
-                    src={`https://loremflickr.com/600/400/${slide.img},business/all?lock=${index + 1}`} 
+                    src={slide.img} 
                     alt={slide.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
