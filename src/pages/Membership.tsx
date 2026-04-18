@@ -99,11 +99,23 @@ export default function Membership() {
     return (
        <Button 
          onClick={() => {
-           // @ts-ignore - The react-paystack typings are sometimes flaky with success callbacks
-           initPayment(
-             (ref: any) => handleSuccess(ref, tier), 
-             handleClose
-           );
+           console.log("Starting Paystack payment...");
+           // Check if key is present
+           const key = (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY;
+           if (!key) console.warn("VITE_PAYSTACK_PUBLIC_KEY is missing! Using fallback.");
+           
+           try {
+             // @ts-ignore
+             initPayment({
+               onSuccess: (ref: any) => handleSuccess(ref, tier), 
+               onClose: handleClose
+             });
+           } catch(e) {
+             console.error("Paystack launch error:", e);
+             // Fallback to argument syntax if object fails
+             // @ts-ignore
+             initPayment((ref: any) => handleSuccess(ref, tier), handleClose);
+           }
          }} 
          disabled={!exchangeRate || isProcessing}
          variant={tier === 'FUNDING_ACCESS' ? 'default' : 'outline'} 
