@@ -72,20 +72,22 @@ export default function EligibilityCheck() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 flex items-center justify-center">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-16 px-4 flex items-center justify-center relative overflow-hidden">
+      <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-blue-100/40 to-transparent pointer-events-none"></div>
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-xl"
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-xl relative z-10"
       >
-        <Card className="border-0 shadow-xl shadow-gray-200/50">
-          <CardHeader className="text-center pb-8">
-            <CardTitle className="text-3xl font-bold text-gray-900">Check Your Eligibility</CardTitle>
-            <CardDescription className="text-base mt-2">
-              Our AI analyzes your business profile to match you with the right funding partners.
+        <Card className="border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl overflow-hidden bg-white/95 backdrop-blur-xl">
+          <CardHeader className="text-center pb-8 pt-10 px-10 border-b border-slate-100/50 bg-slate-50/30">
+            <CardTitle className="text-3xl font-bold text-slate-900 tracking-tight">Check Your Eligibility</CardTitle>
+            <CardDescription className="text-base mt-3 text-slate-500 font-light">
+              Our AI analyzes your business profile to match you with the right funding partners securely.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-10">
             {isAnalyzing ? (
               <div className="py-16 flex flex-col items-center justify-center space-y-6">
                 <div className="relative w-20 h-20">
@@ -99,9 +101,9 @@ export default function EligibilityCheck() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="revenue" className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-gray-500" /> Annual Revenue (USD)
+                <div className="space-y-3">
+                  <Label htmlFor="revenue" className="flex items-center gap-2 text-slate-700 font-medium">
+                    <DollarSign className="w-4 h-4 text-slate-400" /> Annual Revenue (USD)
                   </Label>
                   <Input 
                     id="revenue" 
@@ -110,18 +112,18 @@ export default function EligibilityCheck() {
                     type="number"
                     value={formData.revenue}
                     onChange={(e) => setFormData({...formData, revenue: e.target.value})}
-                    className="h-12"
+                    className="h-14 bg-slate-50 border-slate-200 focus:bg-white focus:ring-blue-500/20 text-lg rounded-xl transition-all"
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="industry" className="flex items-center gap-2">
-                    <Building className="w-4 h-4 text-gray-500" /> Industry
+                <div className="space-y-3">
+                  <Label htmlFor="industry" className="flex items-center gap-2 text-slate-700 font-medium">
+                    <Building className="w-4 h-4 text-slate-400" /> Industry
                   </Label>
                   <select 
                     id="industry"
                     required
-                    className="flex h-12 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                    className="flex h-14 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-lg text-slate-800 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 transition-all appearance-none"
                     value={formData.industry}
                     onChange={(e) => setFormData({...formData, industry: e.target.value})}
                   >
@@ -135,9 +137,9 @@ export default function EligibilityCheck() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="country" className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-gray-500" /> Operating Country
+                <div className="space-y-3">
+                  <Label htmlFor="country" className="flex items-center gap-2 text-slate-700 font-medium">
+                    <Globe className="w-4 h-4 text-slate-400" /> Operating Country
                   </Label>
                   <Input 
                     id="country" 
@@ -145,13 +147,13 @@ export default function EligibilityCheck() {
                     required 
                     value={formData.country}
                     onChange={(e) => setFormData({...formData, country: e.target.value})}
-                    className="h-12"
+                    className="h-14 bg-slate-50 border-slate-200 focus:bg-white focus:ring-blue-500/20 text-lg rounded-xl transition-all"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="social" className="flex items-center gap-2">
-                    <Share2 className="w-4 h-4 text-gray-500" /> Business Website
+                <div className="space-y-3">
+                  <Label htmlFor="social" className="flex items-center gap-2 text-slate-700 font-medium">
+                    <Share2 className="w-4 h-4 text-slate-400" /> Business Website
                   </Label>
                   <Input 
                     id="social" 
@@ -159,7 +161,7 @@ export default function EligibilityCheck() {
                     required 
                     value={formData.socialPresence}
                     onChange={(e) => setFormData({...formData, socialPresence: e.target.value})}
-                    className="h-12"
+                    className="h-14 bg-slate-50 border-slate-200 focus:bg-white focus:ring-blue-500/20 text-lg rounded-xl transition-all"
                   />
                 </div>
 
@@ -204,7 +206,7 @@ export default function EligibilityCheck() {
 
                 <Button 
                   type="submit" 
-                  className={`w-full h-12 text-lg mt-4 ${debouncedUrl && !isWebsiteConfirmed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`w-full h-14 text-lg mt-8 rounded-xl bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/10 transition-all ${debouncedUrl && !isWebsiteConfirmed ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={!!debouncedUrl && !isWebsiteConfirmed}
                 >
                   Analyze Eligibility

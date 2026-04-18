@@ -107,37 +107,44 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white pt-24 pb-32">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <section className="relative overflow-hidden bg-slate-50 pt-32 pb-40">
+        {/* Sophisticated Background Glow Effects */}
+        <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-blue-100/50 to-transparent"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-40 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full blur-3xl opacity-20 transform -translate-y-1/2"></div>
+        </div>
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:linear-gradient(to_bottom,white,transparent)] opacity-40"></div>
+        
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-6 border border-blue-100">
-                <Zap className="w-4 h-4" /> Powered by Upfrica.africa
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-blue-700 text-sm font-semibold mb-8 border border-blue-100 shadow-sm shadow-blue-900/5">
+                <Zap className="w-4 h-4 text-amber-500" /> Powered by Upfrica.africa
               </span>
-              <img src="/logo.png" alt="DealBridge AI Logo" className="h-16 md:h-20 w-auto mb-6 mx-auto object-contain" />
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-6">
+              <img src="https://i.postimg.cc/zBbdPKJb/logo.png" alt="" className="h-16 md:h-20 w-auto mb-8 mx-auto object-contain drop-shadow-sm" />
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-8 leading-[1.1]">
                 Unlock Funding for Your Business with AI
               </h1>
-              <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+              <p className="text-xl md:text-2xl text-slate-600 mb-12 leading-relaxed max-w-3xl mx-auto font-light">
                 We analyze your business eligibility and connect you directly to our network of partner lenders. No guesswork, just smart matching.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button asChild size="lg" className="w-full sm:w-auto text-base h-12 px-8">
+                <Button asChild size="lg" className="w-full sm:w-auto text-base h-14 px-8 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all rounded-xl">
                   <Link to="/eligibility">
                     Check Eligibility Now <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-base h-12 px-8">
+                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-base h-14 px-8 border-slate-200 hover:bg-slate-50 transition-all rounded-xl font-medium">
                   <Link to="/membership">View Memberships</Link>
                 </Button>
               </div>
-              <p className="mt-6 text-sm text-gray-500 flex items-center justify-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <p className="mt-8 text-sm text-slate-400 flex items-center justify-center gap-2 font-medium">
+                <ShieldCheck className="w-5 h-5 text-emerald-500" />
                 We do not provide capital. We connect you to trusted partners.
               </p>
             </motion.div>
@@ -146,14 +153,14 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-32 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How DealBridge AI Works</h2>
-            <p className="text-gray-600">A streamlined process to get your business funding-ready and matched with the right capital providers.</p>
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl font-bold text-slate-900 mb-6">How DealBridge AI Works</h2>
+            <p className="text-lg text-slate-600 font-light">A streamlined process to get your business funding-ready and matched with the right capital providers.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               {
                 step: "01",
@@ -177,11 +184,11 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.2 }}
-                className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative"
+                className="bg-slate-50 p-10 rounded-3xl border border-slate-100 relative group hover:bg-white hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-300"
               >
-                <div className="text-5xl font-black text-gray-100 absolute top-6 right-6">{item.step}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 relative z-10 mt-8">{item.title}</h3>
-                <p className="text-gray-600 relative z-10 leading-relaxed">{item.desc}</p>
+                <div className="text-6xl font-black text-slate-100 absolute top-8 right-8 group-hover:text-blue-50 transition-colors">{item.step}</div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 relative z-10 mt-12">{item.title}</h3>
+                <p className="text-slate-600 relative z-10 leading-relaxed font-light">{item.desc}</p>
               </motion.div>
             ))}
           </div>
