@@ -18,8 +18,8 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
       <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="DealBridge AI powered by Upfrica.africa" className="h-10 object-contain" />
+          <Link to="/" className="flex items-center gap-2 max-w-[200px] md:max-w-[250px]">
+            <img src="/nlogo.png" alt="DealBridge AI powered by Upfrica.africa" className="h-8 md:h-10 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
@@ -44,9 +44,15 @@ export default function Layout() {
                 value={i18n.language.split('-')[0]} 
                 onChange={handleLanguageChange}
               >
-                <option value="en">EN</option>
-                <option value="fr">FR</option>
-                <option value="sw">SW</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="sw">Kiswahili</option>
+                <option value="es">Español</option>
+                <option value="zh">中文</option>
+                <option value="ar">العربية</option>
+                <option value="hi">हिन्दी</option>
+                <option value="pt">Português</option>
+                <option value="de">Deutsch</option>
               </select>
             </div>
 
@@ -65,13 +71,19 @@ export default function Layout() {
           <div className="flex items-center gap-4 md:hidden">
             <select 
               title="Change language"
-              className="bg-transparent text-sm font-medium text-gray-600 border border-gray-200 rounded p-1 outline-none cursor-pointer"
+              className="bg-transparent text-sm font-medium text-gray-600 border border-gray-200 rounded p-1 outline-none cursor-pointer max-w-[100px] truncate"
               value={i18n.language.split('-')[0]} 
               onChange={handleLanguageChange}
             >
-              <option value="en">EN</option>
-              <option value="fr">FR</option>
-              <option value="sw">SW</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="sw">Kiswahili</option>
+                <option value="es">Español</option>
+                <option value="zh">中文</option>
+                <option value="ar">العربية</option>
+                <option value="hi">हिन्दी</option>
+                <option value="pt">Português</option>
+                <option value="de">Deutsch</option>
             </select>
             <button
               className="p-2 text-gray-600"
@@ -135,8 +147,8 @@ export default function Layout() {
       <footer className="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="DealBridge AI powered by Upfrica.africa" className="h-10 object-contain brightness-0 invert" />
+            <Link to="/" className="flex items-center gap-2 mb-4 max-w-[200px] md:max-w-[250px]">
+              <img src="/nlogo.png" alt="DealBridge AI powered by Upfrica.africa" className="h-8 md:h-10 w-auto object-contain brightness-0 invert" />
             </Link>
             <p className="text-sm text-gray-400 max-w-sm mb-4">
               Powered by Upfrica.africa. {t('footer.description')}

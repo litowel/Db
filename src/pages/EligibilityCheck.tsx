@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { motion } from "motion/react";
-import { Building, DollarSign, Globe, Share2 } from "lucide-react";
+import { Building, DollarSign, Globe, Share2, Check } from "lucide-react";
 import { analyzeBusinessEligibility } from "../lib/gemini";
 
 export default function EligibilityCheck() {
@@ -17,9 +17,37 @@ export default function EligibilityCheck() {
     country: "",
     socialPresence: ""
   });
+  
+  const [debouncedUrl, setDebouncedUrl] = useState("");
+  const [isWebsiteConfirmed, setIsWebsiteConfirmed] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      // Basic URL validation
+      if (formData.socialPresence && formData.socialPresence.includes('.')) {
+        let url = formData.socialPresence;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+        setDebouncedUrl(url);
+        setIsWebsiteConfirmed(false); // Reset confirmation if URL changes
+      } else {
+        setDebouncedUrl("");
+      }
+    }, 1000); // Wait 1 second after user stops typing
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [formData.socialPresence]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (debouncedUrl && !isWebsiteConfirmed) {
+      alert("Please confirm your website preview before analyzing eligibility.");
+      return;
+    }
+    
     setIsAnalyzing(true);
     
     try {
@@ -29,7 +57,7 @@ export default function EligibilityCheck() {
         revenue: revenueNum,
         industry: formData.industry,
         country: formData.country,
-        socialPresence: formData.socialPresence
+        socialPresence: debouncedUrl || formData.socialPresence
       });
 
       // Store result in sessionStorage for the next page
@@ -123,11 +151,11 @@ export default function EligibilityCheck() {
 
                 <div className="space-y-2">
                   <Label htmlFor="social" className="flex items-center gap-2">
-                    <Share2 className="w-4 h-4 text-gray-500" /> Social Presence / Website
+                    <Share2 className="w-4 h-4 text-gray-500" /> Business Website
                   </Label>
                   <Input 
                     id="social" 
-                    placeholder="https://yourwebsite.com or LinkedIn profile" 
+                    placeholder="e.g. yourwebsite.com" 
                     required 
                     value={formData.socialPresence}
                     onChange={(e) => setFormData({...formData, socialPresence: e.target.value})}
@@ -135,7 +163,50 @@ export default function EligibilityCheck() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full h-12 text-lg mt-4">
+                {debouncedUrl && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="space-y-4 border border-blue-100 bg-blue-50/50 p-4 rounded-xl"
+                  >
+                    <Label className="text-sm font-semibold text-blue-900 block">Website Preview</Label>
+                    <div className="w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 relative">
+                        {/* Using an API to bypass iframe X-Frame-Options blocking common on modern sites */}
+                        <img 
+                            src={`https://api.microlink.io/?url=${encodeURIComponent(debouncedUrl)}&screenshot=true&meta=false&embed=screenshot.url`}
+                            alt="Website Preview"
+                            className="w-full h-full object-cover object-top"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = `https://loremflickr.com/600/400/website?lock=${debouncedUrl.length}`;
+                            }}
+                        />
+                        <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur text-xs px-2 py-1 rounded shadow-sm flex items-center gap-2 truncate">
+                           <Globe className="w-3 h-3 text-blue-500 shrink-0" />
+                           <span className="truncate">{debouncedUrl}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-blue-100 shadow-sm pr-2">
+                        <span className="text-sm text-gray-700 font-medium">Is this your business website?</span>
+                        <Button 
+                            type="button" 
+                            variant={isWebsiteConfirmed ? "default" : "outline"}
+                            size="sm"
+                            className={`gap-2 transition-colors ${isWebsiteConfirmed ? "bg-green-600 hover:bg-green-700" : "hover:border-blue-300"}`}
+                            onClick={() => setIsWebsiteConfirmed(!isWebsiteConfirmed)}
+                        >
+                            {isWebsiteConfirmed ? <Check className="w-4 h-4" /> : null}
+                            {isWebsiteConfirmed ? "Confirmed" : "Yes, confirm"}
+                        </Button>
+                    </div>
+                  </motion.div>
+                )}
+
+                <Button 
+                  type="submit" 
+                  className={`w-full h-12 text-lg mt-4 ${debouncedUrl && !isWebsiteConfirmed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={!!debouncedUrl && !isWebsiteConfirmed}
+                >
                   Analyze Eligibility
                 </Button>
               </form>
