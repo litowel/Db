@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db, handleFirestoreError, OperationType } from '../../lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, getDocFromServer } from 'firebase/firestore';
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const signIn = async () => {
+  const signIn = useCallback(async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: 'select_account'
@@ -82,24 +82,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await signInWithPopup(auth, provider);
     } catch (error: any) {
-      console.error("Error signing in", error);
+      console.error("Full Authentication Error:", error);
       
-      // If the popup is blocked by the browser, or flashes and closes automatically
-      // due to strict security settings (like Brave, Safari, or mobile browsers),
-      // we gracefully fall back to a full-page redirect.
-      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
-        console.log("Popup closed or blocked. Falling back to redirect...");
-        // Add a tiny delay so the user understands what is happening if they clicked it
+      const errorCode = error.code;
+      if (errorCode === 'auth/unauthorized-domain') {
+        alert(
+          "SECURITY BLOCK: Your app is not authorized to use Firebase Auth on this domain.\n\n" +
+          "Please add this exact URL to your Firebase Authorized Domains list: " + window.location.hostname + "\n\n" +
+          "Domains to add:\n- d111111official.vercel.app\n- dbdb40.vercel.app\n- upfrica.africa"
+        );
+      } else if (
+        errorCode === 'auth/popup-closed-by-user' || 
+        errorCode === 'auth/popup-blocked' ||
+        errorCode === 'auth/cancelled-popup-request'
+      ) {
+        console.log("Popup instantly blocked or closed. Attempting fallback to signInWithRedirect...");
+        alert("Popup blocked or closed. Redirecting you to Google Sign-In directly...");
+        
+        // Add a tiny delay to ensure alert is cleared and browser state settles
         setTimeout(() => {
-          signInWithRedirect(auth, provider).catch(err => {
-            console.error("Redirect sign-in failed", err);
+          signInWithRedirect(auth, provider).catch(redirectError => {
+            console.error("Redirect Fallback Error:", redirectError);
+            alert("Sign in issue during redirect fallback: " + redirectError.message);
           });
-        }, 500);
+        }, 300);
       } else {
         alert("Sign in issue: " + error.message);
       }
     }
-  };
+  }, []);
 
   const logOut = async () => {
     await signOut(auth);
