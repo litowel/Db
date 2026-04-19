@@ -245,13 +245,6 @@ export default function Membership() {
             <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl"></div>
           </motion.div>
         </div>
-
-        <div className="mt-16 text-center">
-          <p className="text-sm text-gray-500">
-            Note: DealBridge AI charges a success fee of 1-3% only when funding is successfully secured through our partner network.
-            <br/>All payments are processed securely in GHS via Paystack at current live exchange rates.
-          </p>
-        </div>
       </div>
     </div>
   );

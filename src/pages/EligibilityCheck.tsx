@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { motion } from "motion/react";
-import { Building, DollarSign, Globe, Share2, Check } from "lucide-react";
+import { Building, DollarSign, Globe, Share2, Check, UploadCloud, FileText, X } from "lucide-react";
 import { analyzeBusinessEligibility } from "../lib/gemini";
 
 export default function EligibilityCheck() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [formData, setFormData] = useState({
     revenue: "",
@@ -18,6 +20,7 @@ export default function EligibilityCheck() {
     socialPresence: ""
   });
   
+  const [statementFile, setStatementFile] = useState<File | null>(null);
   const [debouncedUrl, setDebouncedUrl] = useState("");
   const [isWebsiteConfirmed, setIsWebsiteConfirmed] = useState(false);
 
@@ -41,6 +44,25 @@ export default function EligibilityCheck() {
     };
   }, [formData.socialPresence]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      // Allow pdf, csv, excel, image
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size must be less than 10MB");
+        return;
+      }
+      setStatementFile(file);
+    }
+  };
+
+  const removeFile = () => {
+    setStatementFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (debouncedUrl && !isWebsiteConfirmed) {
@@ -53,11 +75,32 @@ export default function EligibilityCheck() {
     try {
       const revenueNum = parseInt(formData.revenue.replace(/[^0-9]/g, ''));
       
+      let documentFileObj = undefined;
+
+      // Convert statement file to inline base64 data for Gemini
+      if (statementFile) {
+        const reader = new FileReader();
+        await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(statementFile);
+        });
+        
+        if (typeof reader.result === 'string') {
+          // dataURL format: data:image/png;base64,iVBORw0KGgo...
+          const base64Data = reader.result.split(',')[1];
+          const mimeType = reader.result.split(',')[0].split(':')[1].split(';')[0];
+          documentFileObj = { mimeType, data: base64Data };
+        }
+      }
+      
       const analysisInfo = await analyzeBusinessEligibility({
         revenue: revenueNum,
         industry: formData.industry,
         country: formData.country,
-        socialPresence: debouncedUrl || formData.socialPresence
+        socialPresence: debouncedUrl || formData.socialPresence,
+        hasFinancialStatement: !!statementFile,
+        documentFile: documentFileObj
       });
 
       // Store result in sessionStorage for the next page
@@ -163,6 +206,50 @@ export default function EligibilityCheck() {
                     onChange={(e) => setFormData({...formData, socialPresence: e.target.value})}
                     className="h-14 bg-slate-50 border-slate-200 focus:bg-white focus:ring-blue-500/20 text-lg rounded-xl transition-all"
                   />
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  <Label className="flex items-center gap-2 text-slate-700 font-medium">
+                    <FileText className="w-4 h-4 text-slate-400" /> Recent Financial Statement (Optional)
+                  </Label>
+                  <div className="flex items-center gap-4">
+                    <input 
+                      type="file" 
+                      id="financial_statement"
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleFileChange}
+                      accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx"
+                    />
+                    {!statementFile ? (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full h-14 border-dashed border-2 border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-600 gap-2 rounded-xl"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <UploadCloud className="w-5 h-5 text-slate-400" />
+                        Upload Document (PDF, Image)
+                      </Button>
+                    ) : (
+                      <div className="w-full h-14 border border-blue-200 bg-blue-50/50 rounded-xl px-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <FileText className="w-5 h-5 text-blue-600 shrink-0" />
+                          <span className="text-sm font-medium text-blue-900 truncate">{statementFile.name}</span>
+                        </div>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-slate-400 hover:text-red-500"
+                          onClick={removeFile}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500">Securely upload a recent bank statement or P&L statement to significantly improve funding match accuracy.</p>
                 </div>
 
                 {debouncedUrl && (

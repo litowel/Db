@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { motion } from "motion/react";
-import { CheckCircle2, XCircle, TrendingUp, AlertTriangle, ArrowRight, Lightbulb } from "lucide-react";
+import { CheckCircle2, XCircle, TrendingUp, AlertTriangle, ArrowRight, Lightbulb, FileCheck2 } from "lucide-react";
 import { EligibilityAnalysis } from "../lib/gemini";
 
 export default function EligibilityResult() {
@@ -30,101 +30,111 @@ export default function EligibilityResult() {
   const riskPercentage = Math.max(5, 100 - result.riskScore); // Just for visually pleasing progress bar
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-16 px-4 font-sans">
+      <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mb-8 text-center"
+          className="mb-10 text-center"
         >
           {isQualified ? (
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-6">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-emerald-50 border-8 border-emerald-100 mb-6 shadow-sm">
               <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             </div>
           ) : (
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-100 mb-6">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-amber-50 border-8 border-amber-100 mb-6 shadow-sm">
               <AlertTriangle className="w-10 h-10 text-amber-600" />
             </div>
           )}
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {isQualified ? "You're Qualified for Funding!" : "Not Quite Ready Yet"}
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+            {isQualified ? "Pre-Qualified for Funding" : "Profile Optimization Required"}
           </h1>
-          <p className="text-lg text-gray-600 max-w-xl mx-auto">
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
             {isQualified 
-              ? "Based on your profile, you meet the criteria for several of our partner lenders."
-              : "Your business needs a bit more traction before matching with our current lender network."}
+              ? "Based on our AI financial analysis parameters, your business model indicates strong baseline metrics for top-tier matched lenders."
+              : "Your business model requires a bit more structural traction before matching with our institutional lender network."}
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-medium text-gray-500 uppercase tracking-wider">Analysis Summary</CardTitle>
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <Card className="border-0 shadow-lg shadow-slate-200/40 rounded-2xl overflow-hidden h-full flex flex-col">
+            <CardHeader className="bg-white border-b border-slate-100 pb-5">
+              <CardTitle className="text-sm font-bold text-slate-400 uppercase tracking-widest">Financial Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 pt-6 bg-white flex-1">
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700 font-medium">Risk Score</span>
-                  <Badge variant={riskClass}>
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-slate-700 font-semibold text-sm">Automated Risk Score</span>
+                  <Badge variant={riskClass} className="px-3 py-1 text-xs">
                     {riskLabel}
                   </Badge>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                   <div 
-                    className={`h-full rounded-full ${result.riskScore < 50 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                    className={`h-full rounded-full transition-all duration-1000 ${result.riskScore < 50 ? 'bg-emerald-500' : 'bg-amber-500'}`}
                     style={{ width: `${riskPercentage}%` }}
                   ></div>
                 </div>
               </div>
 
               {isQualified && (
-                <div className="pt-4 border-t border-gray-100">
-                  <span className="text-gray-500 text-sm block mb-1">Estimated Funding Range</span>
-                  <span className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                <div className="pt-5 border-t border-slate-100">
+                  <span className="text-slate-500 text-sm font-medium block mb-2">Estimated Cap Limit</span>
+                  <span className="text-3xl font-black text-slate-900 flex items-center gap-3">
+                    <TrendingUp className="w-6 h-6 text-blue-600" />
                     ${result.estimatedFundingMin?.toLocaleString() || 0} - ${result.estimatedFundingMax?.toLocaleString() || 0}
                   </span>
                 </div>
               )}
               
-              <div className="pt-4 border-t border-gray-100">
-                <span className="text-gray-500 text-sm block mb-2">Suggested Funding Type</span>
+              <div className="pt-5 border-t border-slate-100">
+                <span className="text-slate-500 text-sm font-medium block mb-3">Suggested Capital Types</span>
                 <div className="flex flex-wrap gap-2">
                   {result.suggestedFundingTypes?.length > 0 ? (
                     result.suggestedFundingTypes.map((type, idx) => (
-                      <Badge key={idx} variant="secondary">{type}</Badge>
+                      <Badge key={idx} variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">{type}</Badge>
                     ))
                   ) : (
-                    <Badge variant="secondary">Bootstrapping</Badge>
+                    <Badge variant="secondary">Bootstrapping / Friends & Family</Badge>
                   )}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-blue-50 border-blue-100">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-medium text-blue-800 uppercase tracking-wider flex items-center gap-2">
-                <Lightbulb className="w-4 h-4" /> AI Insights & Recommendations
+          <Card className="border-0 shadow-lg shadow-slate-200/40 rounded-2xl h-full flex flex-col">
+            <CardHeader className="bg-slate-50 border-b border-slate-100 pb-5">
+              <CardTitle className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <Lightbulb className="w-4 h-4" /> AI Strategic Insights
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {result.insights?.map((insight, idx) => (
-                  <div key={`insight-${idx}`} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                    <span className="text-blue-900 text-sm">{insight}</span>
-                  </div>
-                ))}
+            <CardContent className="p-8 space-y-8 flex-1">
+              <div>
+                <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Key Strengths
+                </h4>
+                <ul className="space-y-4">
+                  {result.insights?.map((insight, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                      <span className="text-slate-700 leading-relaxed font-medium text-sm">{insight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-                {result.improvements?.length > 0 && <hr className="border-blue-200 my-2" />}
-
-                {result.improvements?.map((imp, idx) => (
-                  <div key={`imp-${idx}`} className="flex items-start gap-3">
-                    <Lightbulb className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                    <span className="text-blue-900 text-sm">{imp}</span>
-                  </div>
-                ))}
+              <div>
+                <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-blue-500" /> Suggested Improvements
+                </h4>
+                <ul className="space-y-4">
+                  {result.improvements?.map((improvement, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></span>
+                      <span className="text-slate-700 leading-relaxed font-medium text-sm">{improvement}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </CardContent>
           </Card>
@@ -133,23 +143,21 @@ export default function EligibilityResult() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm text-center"
+          transition={{ delay: 0.3 }}
+          className="text-center bg-white border border-slate-200 shadow-xl shadow-slate-200/50 rounded-2xl p-10 mt-10"
         >
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          <h3 className="text-3xl font-extrabold text-slate-900 mb-4">
             {isQualified 
-              ? "Unlock full funding access and apply to lenders"
-              : "Get funding-ready with our Growth Program"}
+              ? "Ready to secure your funding?"
+              : "Let's build your funding roadmap."}
           </h3>
-          <p className="text-gray-600 mb-8 max-w-xl mx-auto">
+          <p className="text-slate-600 mb-8 font-medium text-lg max-w-2xl mx-auto">
             {isQualified
-              ? "Join our Funding Access Membership to get priority deal matching, structured application summaries, and direct introductions to lenders."
-              : "Join our Growth Membership to get a step-by-step roadmap, AI improvement tips, and business optimization insights."}
+              ? "Join your Funding Access tier to bypass waitlists, execute structured applications instantly, and initiate direct lender matches."
+              : "Join our Growth Program to secure monthly actionable guidance until your metrics hit pre-qualification baselines."}
           </p>
-          <Button asChild size="lg" className="h-14 px-8 text-lg w-full sm:w-auto">
-            <Link to="/membership">
-              {isQualified ? "Join Funding Access Program" : "Join Growth Program"} <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Button asChild size="lg" className="h-14 px-10 text-lg rounded-xl bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20">
+            <Link to="/membership">View Verified Match Memberships <ArrowRight className="ml-2 w-5 h-5" /></Link>
           </Button>
         </motion.div>
       </div>

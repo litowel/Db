@@ -21,6 +21,8 @@ export async function analyzeBusinessEligibility(data: {
   industry: string;
   country: string;
   socialPresence: string;
+  hasFinancialStatement?: boolean;
+  documentFile?: { mimeType: string; data: string };
 }): Promise<EligibilityAnalysis> {
   const prompt = `You are a Fintech AI analyzer for 'DealBridge AI'.
 Analyze the funding eligibility for a business with the following profile:
@@ -28,18 +30,25 @@ Analyze the funding eligibility for a business with the following profile:
 - Industry: ${data.industry}
 - Operating Country: ${data.country}
 - Social/Web Presence: ${data.socialPresence}
+- Document Provided: ${data.hasFinancialStatement ? 'Recent business financial statement uploaded.' : 'None'}
 
 Determine if this business is qualified for partner funding. 
 General guidelines: Revenue > $50,000 in major/supported markets is typically 'Qualified'. 
 A lower risk score (0-100) is better. 
-Estimated funding is usually 10% to 30% of annual revenue.
-Provide 2 realistic business insights explaining why they are or aren't qualified.
+If a financial statement is attached, deeply analyze it to adjust the risk score (lower if finances are healthy, higher if concerning) and accurately adjust estimated funding amounts based on the specific metrics in the document.
+Estimated funding is usually 10% to 30% of annual revenue, but adjust if document proves strong cash flow.
+Provide 2 realistic business insights explaining why they are or aren't qualified (reference the document explicitly if it was provided).
 Provide 2 actionable improvements they should make to increase their funding chances or amount.`;
 
   try {
+    const requestContents: any = data.documentFile ? [
+      prompt,
+      { inlineData: data.documentFile }
+    ] : prompt;
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: prompt,
+      contents: requestContents,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
