@@ -74,7 +74,7 @@ export default function Membership() {
 
   const paystackConfig = {
     // Falls back to a specific testing key if none is provided via env
-    publicKey: (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_a04282ba755b1160a0ad8fcab85e3150eedbb7ae',
+    publicKey: process.env.PAYSTACK_PUBLIC_KEY || 'pk_test_a04282ba755b1160a0ad8fcab85e3150eedbb7ae',
     currency: 'GHS',
   };
 
@@ -123,8 +123,8 @@ export default function Membership() {
              }
              console.log("Starting Paystack payment...");
              // Check if key is present
-             const key = (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY;
-             if (!key) console.warn("VITE_PAYSTACK_PUBLIC_KEY is missing! Using fallback.");
+             const key = process.env.PAYSTACK_PUBLIC_KEY;
+             if (!key) console.warn("PAYSTACK_PUBLIC_KEY is missing! Using fallback.");
              
              try {
                // @ts-ignore
