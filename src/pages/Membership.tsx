@@ -110,7 +110,7 @@ export default function Membership() {
             <input 
               type="email" 
               placeholder="Enter your email for receipt" 
-              className="w-full px-4 py-2 border rounded-md text-sm text-gray-900 bg-white/10"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white placeholder:text-gray-500"
               value={guestEmail}
               onChange={(e) => setGuestEmail(e.target.value)}
             />
@@ -121,20 +121,27 @@ export default function Membership() {
                 alert("Please enter a quick email to receive your payment receipt.");
                 return;
              }
-             console.log("Starting Paystack payment...");
+             console.log(`Starting Paystack payment for ${tier}...`);
              // Check if key is present
              const key = process.env.PAYSTACK_PUBLIC_KEY;
              if (!key) console.warn("PAYSTACK_PUBLIC_KEY is missing! Using fallback.");
              
+             // Define fresh config exactly when clicked to avoid stable closure bugs
+             const freshConfig = {
+               ...paystackConfig,
+               email: user?.email || guestEmail || 'guest@dealbridge.ai',
+               amount: Math.round(usdPrice * exchangeRate * 100),
+             };
+             
              try {
                // @ts-ignore
                initPayment({
+                 ...freshConfig,
                  onSuccess: (ref: any) => handleSuccess(ref, tier), 
                  onClose: handleClose
                });
              } catch(e) {
                console.error("Paystack launch error:", e);
-               // Fallback to argument syntax if object fails
                // @ts-ignore
                initPayment((ref: any) => handleSuccess(ref, tier), handleClose);
              }
