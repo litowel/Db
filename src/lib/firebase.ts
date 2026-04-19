@@ -2,20 +2,12 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBpmWGt0YGwkfZiKJTkEo9lThRnXyHHdLE",
-  authDomain: "vaultx-bankbuilder.firebaseapp.com",
-  projectId: "vaultx-bankbuilder",
-  storageBucket: "vaultx-bankbuilder.firebasestorage.app",
-  messagingSenderId: "766984352610",
-  appId: "1:766984352610:web:8ffe8e71bf7956b908723b"
-};
+// Import the managed AI Studio Firebase configuration
+import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase securely (prevents double initialization errors)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-// Using standard getFirestore initialization for standard project databases
-export const db = getFirestore(app);
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 
 // Error Handling Function

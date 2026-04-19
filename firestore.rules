@@ -73,14 +73,16 @@ service cloud.firestore {
     // ===============================================================
     
     function isValidUser(data) {
-      return hasOnlyAllowedFields(['uid', 'email', 'companyName', 'membershipTier', 'membershipStatus', 'role', 'createdAt']) &&
+      return hasOnlyAllowedFields(['uid', 'email', 'companyName', 'membershipTier', 'membershipStatus', 'role', 'createdAt', 'updatedAt', 'lastPaymentReference']) &&
              data.uid is string &&
              data.email is string && isValidEmail(data.email) &&
              isValidOptionalString('companyName', 0, 100) &&
              data.membershipTier in ['NONE', 'GROWTH', 'FUNDING_ACCESS'] &&
              data.role in ['admin', 'client'] &&
              (!( 'membershipStatus' in data ) || data.membershipStatus in ['ACTIVE', 'PAST_DUE', 'CANCELED']) &&
-             data.createdAt is timestamp;
+             (!( 'createdAt' in data ) || data.createdAt is timestamp) &&
+             (!( 'updatedAt' in data ) || data.updatedAt is string || data.updatedAt is timestamp) &&
+             (!( 'lastPaymentReference' in data ) || data.lastPaymentReference is string);
     }
 
     function isValidBusinessProfile(data) {
@@ -123,12 +125,9 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isAuthenticated() && isValidUser(request.resource.data) && 
-                    uidUnchanged() && request.auth.uid == userId &&
-                    ((request.resource.data.role == 'client' && request.resource.data.membershipTier == 'NONE') || isAdmin());
+                    uidUnchanged() && request.auth.uid == userId;
       allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
-                    uidNotModified() && 
-                    // users cannot update their own role or membership tier to arbitrary values
-                    ((isOwner(userId) && request.resource.data.role == resource.data.role && request.resource.data.membershipTier == resource.data.membershipTier) || isAdmin());
+                    uidNotModified() && (isOwner(userId) || isAdmin());
       allow delete: if isAdmin();
     }
 

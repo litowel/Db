@@ -5,8 +5,9 @@ import { CheckCircle2, Star, Loader2, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { usePaystackPayment } from "react-paystack";
 import { useAuth } from "../components/layout/AuthProvider";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { signInAnonymously } from "firebase/auth";
+import { db, auth } from "../lib/firebase";
 
 const GROWTH_PRICE_USD = 49;
 const FUNDING_ACCESS_PRICE_USD = 199;
@@ -17,6 +18,7 @@ export default function Membership() {
   
   const [exchangeRate, setExchangeRate] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [guestEmail, setGuestEmail] = useState("");
 
   useEffect(() => {
     // Fetch live USD to GHS exchange rate
@@ -36,13 +38,27 @@ export default function Membership() {
   }, []);
 
   const handleSuccess = async (reference: any, tier: 'GROWTH' | 'FUNDING_ACCESS') => {
-    if (!user) return;
     setIsProcessing(true);
     try {
-      await updateDoc(doc(db, "users", user.uid), {
+      let currentUser = user;
+      
+      // Auto-authenticate as guest if they are not logged in!
+      if (!currentUser) {
+        console.log("Creating anonymous session for fast-track dashboard access...");
+        const cred = await signInAnonymously(auth);
+        currentUser = cred.user as any;
+      }
+
+      await setDoc(doc(db, "users", currentUser!.uid), {
+        uid: currentUser!.uid,
+        role: "client",
+        email: currentUser!.email || guestEmail || 'guest@dealbridge.ai',
         membershipTier: tier,
-        membershipStatus: "ACTIVE"
-      });
+        membershipStatus: "ACTIVE",
+        lastPaymentReference: reference?.reference || reference?.transaction || "unknown_reference",
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      
       // Allow database to sync locally
       setTimeout(() => navigate('/dashboard'), 1500);
     } catch (error) {
@@ -65,25 +81,17 @@ export default function Membership() {
   // Setup Paystack Hooks
   const initializeGrowthPayment = usePaystackPayment({
     ...paystackConfig,
-    email: user?.email || '',
+    email: user?.email || guestEmail || 'guest@dealbridge.ai',
     amount: Math.round(GROWTH_PRICE_USD * exchangeRate * 100), // Lowest currency unit (Pesewas)
   });
 
   const initializeFundingPayment = usePaystackPayment({
     ...paystackConfig,
-    email: user?.email || '',
+    email: user?.email || guestEmail || 'guest@dealbridge.ai',
     amount: Math.round(FUNDING_ACCESS_PRICE_USD * exchangeRate * 100), // Lowest currency unit (Pesewas)
   });
 
   const renderActionButton = (tier: 'GROWTH' | 'FUNDING_ACCESS', usdPrice: number, initPayment: any) => {
-    if (!user) {
-      return (
-        <Button onClick={signIn} variant={tier === 'FUNDING_ACCESS' ? 'default' : 'outline'} className={`w-full h-12 text-base ${tier === 'FUNDING_ACCESS' ? 'bg-blue-600 hover:bg-blue-500 text-white' : ''} relative z-10`}>
-          Sign In to Join
-        </Button>
-      );
-    }
-
     if (dbUser?.membershipTier === tier) {
        return (
          <Button disabled variant="outline" className={`w-full h-12 text-base ${tier === 'FUNDING_ACCESS' ? 'bg-gray-800 text-gray-500 border-gray-700' : ''} relative z-10`}>
@@ -97,33 +105,48 @@ export default function Membership() {
     if (dbUser?.membershipTier === 'GROWTH' && tier === 'FUNDING_ACCESS') btnText = `Upgrade for $${usdPrice}`;
 
     return (
-       <Button 
-         onClick={() => {
-           console.log("Starting Paystack payment...");
-           // Check if key is present
-           const key = (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY;
-           if (!key) console.warn("VITE_PAYSTACK_PUBLIC_KEY is missing! Using fallback.");
-           
-           try {
-             // @ts-ignore
-             initPayment({
-               onSuccess: (ref: any) => handleSuccess(ref, tier), 
-               onClose: handleClose
-             });
-           } catch(e) {
-             console.error("Paystack launch error:", e);
-             // Fallback to argument syntax if object fails
-             // @ts-ignore
-             initPayment((ref: any) => handleSuccess(ref, tier), handleClose);
-           }
-         }} 
-         disabled={!exchangeRate || isProcessing}
-         variant={tier === 'FUNDING_ACCESS' ? 'default' : 'outline'} 
-         className={`w-full h-12 text-base ${tier === 'FUNDING_ACCESS' ? 'bg-blue-600 hover:bg-blue-500 text-white' : ''} relative z-10`}
-       >
-         {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : btnText}
-         {!isProcessing && <ArrowRight className="w-4 h-4 ml-2" />}
-       </Button>
+       <div className="flex flex-col gap-3">
+         {!user && (
+            <input 
+              type="email" 
+              placeholder="Enter your email for receipt" 
+              className="w-full px-4 py-2 border rounded-md text-sm text-gray-900 bg-white/10"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+            />
+         )}
+         <Button 
+           onClick={() => {
+             if (!user && !guestEmail) {
+                alert("Please enter a quick email to receive your payment receipt.");
+                return;
+             }
+             console.log("Starting Paystack payment...");
+             // Check if key is present
+             const key = (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY;
+             if (!key) console.warn("VITE_PAYSTACK_PUBLIC_KEY is missing! Using fallback.");
+             
+             try {
+               // @ts-ignore
+               initPayment({
+                 onSuccess: (ref: any) => handleSuccess(ref, tier), 
+                 onClose: handleClose
+               });
+             } catch(e) {
+               console.error("Paystack launch error:", e);
+               // Fallback to argument syntax if object fails
+               // @ts-ignore
+               initPayment((ref: any) => handleSuccess(ref, tier), handleClose);
+             }
+           }} 
+           disabled={!exchangeRate || isProcessing}
+           variant={tier === 'FUNDING_ACCESS' ? 'default' : 'outline'} 
+           className={`w-full h-12 text-base ${tier === 'FUNDING_ACCESS' ? 'bg-blue-600 hover:bg-blue-500 text-white' : ''} relative z-10`}
+         >
+           {isProcessing ? <Loader2 className="animate-spin w-5 h-5" /> : btnText}
+           {!isProcessing && <ArrowRight className="w-4 h-4 ml-2" />}
+         </Button>
+       </div>
     );
   };
 

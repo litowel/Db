@@ -60,11 +60,7 @@ export default function Layout() {
               <Button onClick={logOut} variant="outline" size="sm" className="gap-2 ml-2">
                 <LogOut className="w-4 h-4" /> {t('nav.logOut')}
               </Button>
-            ) : (
-              <Button onClick={signIn} variant="default" size="sm" className="gap-2 ml-2">
-                <LogIn className="w-4 h-4" /> {t('nav.signIn')}
-              </Button>
-            )}
+            ) : null}
           </nav>
 
           {/* Mobile Menu Toggle */}
@@ -128,14 +124,7 @@ export default function Layout() {
               >
                 <LogOut className="w-4 h-4" /> {t('nav.logOut')}
               </Button>
-            ) : (
-              <Button 
-                onClick={() => { signIn(); setIsMenuOpen(false); }} 
-                className="w-full gap-2 justify-center"
-              >
-                <LogIn className="w-4 h-4" /> {t('nav.signIn')}
-              </Button>
-            )}
+            ) : null}
           </div>
         )}
       </header>
