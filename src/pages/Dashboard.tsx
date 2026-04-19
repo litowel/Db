@@ -46,8 +46,11 @@ export default function Dashboard() {
             <Badge variant={memberBadgeStatus} className="px-3 py-1 text-sm">
               {memberLabel}
             </Badge>
+            <Button asChild variant="outline">
+              <Link to="/vault">Data Room</Link>
+            </Button>
             <Button asChild>
-              <Link to="/apply">New Application</Link>
+              <Link to="/apply">Deal Room</Link>
             </Button>
           </div>
         </div>
@@ -69,12 +72,12 @@ export default function Dashboard() {
           </Card>
           <Card>
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <FileText className="w-6 h-6 text-emerald-600" />
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                <Building2 className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Active Applications</p>
-                <p className="text-2xl font-bold text-gray-900">0</p>
+                <p className="text-sm font-medium text-gray-500">Lender Matches</p>
+                <p className="text-2xl font-bold text-gray-900">4</p>
               </div>
             </CardContent>
           </Card>
@@ -92,21 +95,21 @@ export default function Dashboard() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Main Content - Applications */}
+          {/* Main Content - Deal Room Link */}
           <div className="md:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Applications</CardTitle>
+                <CardTitle>Lender Marketplace</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-10 space-y-4">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                    <FileText className="w-8 h-8 text-gray-400" />
+                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
+                    <Building2 className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900">No active applications</h3>
-                  <p className="text-gray-500 max-w-sm mx-auto">You haven't submitted any funding applications yet. Check your eligibility and apply to get matched with lenders.</p>
-                  <Button asChild variant="outline" className="mt-2">
-                    <Link to="/apply">Start Application</Link>
+                  <h3 className="text-lg font-medium text-gray-900">4 Lenders Matched</h3>
+                  <p className="text-gray-500 max-w-sm mx-auto">Our algorithm has matched your business with 4 institutional lenders. View your matches in the Deal Room.</p>
+                  <Button asChild className="mt-2 text-white bg-blue-600 hover:bg-blue-700">
+                    <Link to="/apply">View Lender Matches</Link>
                   </Button>
                 </div>
               </CardContent>
